@@ -1,5 +1,14 @@
 # TrelloWarrior
 
+[https://img.shields.io/pypi/v/trellowarrior.svg](https://pypi.python.org/pypi/trellowarrior)
+
+[https://img.shields.io/travis/ogarcia/trellowarrior.svg](https://travis-ci.org/ogarcia/trellowarrior)
+
+[https://readthedocs.org/projects/trellowarrior/badge/?version=latest](https://trellowarrior.readthedocs.io/en/latest/?badge=latest)
+
+[https://pyup.io/repos/github/ogarcia/trellowarrior/shield.svg](https://pyup.io/repos/github/ogarcia/trellowarrior/)
+
+
 Tool to sync Taskwarrior projects with Trello boards.
 
 ## Requirements
@@ -174,3 +183,11 @@ If you have several boards with same name, TrelloWarrior always picks the
 first one.
 
 For now, only syncs *Title/Description*, *Due dates* and *Status*.
+
+## Credits
+
+This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+
+.. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
