@@ -56,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Trellowarrior'
-copyright = u"2018, Jean Jordaan"
+copyright = u"2018, Óscar García Amor"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -210,7 +210,7 @@ latex_elements = {
 latex_documents = [
     ('index', 'trellowarrior.tex',
      u'Trellowarrior Documentation',
-     u'Jean Jordaan', 'manual'),
+     u'Óscar García Amor', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at
@@ -241,7 +241,7 @@ latex_documents = [
 man_pages = [
     ('index', 'trellowarrior',
      u'Trellowarrior Documentation',
-     [u'Jean Jordaan'], 1)
+     [u'Óscar García Amor'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -256,7 +256,7 @@ man_pages = [
 texinfo_documents = [
     ('index', 'trellowarrior',
      u'Trellowarrior Documentation',
-     u'Jean Jordaan',
+     u'Óscar García Amor',
      'trellowarrior',
      'One line description of project.',
      'Miscellaneous'),

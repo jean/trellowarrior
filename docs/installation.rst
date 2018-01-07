@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/jean/trellowarrior
+    $ git clone git://github.com/ogarcia/trellowarrior
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/jean/trellowarrior/tarball/master
+    $ curl  -OL https://github.com/ogarcia/trellowarrior/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/jean/trellowarrior
-.. _tarball: https://github.com/jean/trellowarrior/tarball/master
+.. _Github repo: https://github.com/ogarcia/trellowarrior
+.. _tarball: https://github.com/ogarcia/trellowarrior/tarball/master

@@ -8,11 +8,11 @@ Tool to sync Taskwarrior projects with Trello boards.
 
 First for all you need configure some UDAs in Taskwarrior to store some
 Trello data. This is very, very, very important. If you dont have the UDAs
-configured before run TrelloWarrior you'll destroy your Taskwarrior tasks
+configured before running TrelloWarrior, you'll destroy your Taskwarrior task
 data.
 
-To set UDAs in Taskwarrior simply edit `.taskrc` and add the following
-lines.
+To set UDAs in Taskwarrior, simply edit `.taskrc` and add the following
+lines:
 
 ```
 # UDAs
@@ -22,11 +22,11 @@ uda.trellolistname.type=string
 uda.trellolistname.label=Trello List Name
 ```
 
-The first UDA `trelloid` is used to store the Trello Card ID and establish
+The first UDA (`trelloid`) is used to store the Trello Card ID and establish
 an equivalence between Trello Cards and Taskwarrior Tasks. Note that you
-never, never, never, never, (period), should edit this field.
+should never, never, never, never, (period), edit this field.
 
-The second UDA `trellolistname` is used to determine the Trello List where
+The second UDA (`trellolistname`) is used to determine the Trello List where
 the Card/Task is stored. You can edit this field without problems to move
 the task to another list.
 
@@ -34,12 +34,12 @@ the task to another list.
 
 #### Prepare the environment
 
-For run TrelloWarrior you need to install
+To run TrelloWarrior you need to install
 [tasklib](https://github.com/robgolding63/tasklib) and
 [py-trello](https://github.com/sarumont/py-trello). TrelloWarrior uses these
 Python helpers to comunicate with Taskwarrior and Trello.
 
-You can use your package system to install it, but the easy way is to use
+You can use your package system to install them, but the easy way is to use
 a Python 2.7 virtualenv:
 
 ```sh

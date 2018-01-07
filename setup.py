@@ -31,9 +31,9 @@ setup(
     version='0.1.0',
     description="Syncs Trello boards and Taskwarrior projects.",
     long_description=readme + '\n\n' + history,
-    author="Jean Jordaan",
-    author_email='jean.jordaan@gmail.com',
-    url='https://github.com/jean/trellowarrior',
+    author="Óscar García Amor",
+    author_email='ogarcia@...',
+    url='https://github.com/ogarcia/trellowarrior',
     packages=find_packages(include=['trellowarrior']),
     entry_points={
         'console_scripts': [

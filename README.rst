@@ -6,15 +6,15 @@ Trellowarrior
 .. image:: https://img.shields.io/pypi/v/trellowarrior.svg
         :target: https://pypi.python.org/pypi/trellowarrior
 
-.. image:: https://img.shields.io/travis/jean/trellowarrior.svg
-        :target: https://travis-ci.org/jean/trellowarrior
+.. image:: https://img.shields.io/travis/ogarcia/trellowarrior.svg
+        :target: https://travis-ci.org/ogarcia/trellowarrior
 
 .. image:: https://readthedocs.org/projects/trellowarrior/badge/?version=latest
         :target: https://trellowarrior.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/jean/trellowarrior/shield.svg
-     :target: https://pyup.io/repos/github/jean/trellowarrior/
+.. image:: https://pyup.io/repos/github/ogarcia/trellowarrior/shield.svg
+     :target: https://pyup.io/repos/github/ogarcia/trellowarrior/
      :alt: Updates
 
 

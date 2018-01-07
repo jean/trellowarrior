@@ -5,9 +5,9 @@ Credits
 Development Lead
 ----------------
 
-* Jean Jordaan <jean.jordaan@gmail.com>
+* Óscar García Amor <ogarcia@...>
 
 Contributors
 ------------
 
-None yet. Why not be the first?
+* Jean Jordaan <jean.jordaan@gmail.com>
