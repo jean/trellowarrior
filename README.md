@@ -169,8 +169,9 @@ equivalence between Taskwarrior and Trello.
 
 ## Known limitations
 
-The main objective of TaskWarrior is to be simple so it **doesn't manage
-collisions**. The sync strategy is **last modified wins**, this means that if
+The main objective of TaskWarrior is to be simple so it 
+**doesn't manage collisions**.
+The sync strategy is **last modified wins**, this means that if
 you do a modification in Trello and later a modification in Taskwarrior,
 TrelloWarrior does the sync and keeps the Taskwarrior data, because it is
 the last touched.

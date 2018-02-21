@@ -6,15 +6,21 @@
 #
 # Distributed under terms of the MIT license.
 
+import logging
+
 from ConfigParser import RawConfigParser
 from tasklib.task import Task
 from tasklib.backends import TaskWarrior
 from trello import TrelloClient
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+# logger.basicConfig(level=logging.WARNING)
+
 def parse_config(config_file):
     """
-    Parse config file and return true if all ok
-    All config settings are stored in globar vars
+    Parse config file and return True if all OK.
+    All config settings are stored in global vars.
 
     :config_file: config file name
     """
@@ -25,26 +31,39 @@ def parse_config(config_file):
     conf = RawConfigParser()
     try:
         conf.read(config_file)
-    except Exception:
+    except Exception as e:
+        logger.exception('Failed to read config', e)
         return False
     if (not conf.has_option('DEFAULT', 'trello_api_key') or
         not conf.has_option('DEFAULT', 'trello_api_secret') or
         not conf.has_option('DEFAULT', 'trello_token') or
         not conf.has_option('DEFAULT', 'trello_token_secret') or
         not conf.has_option('DEFAULT', 'sync_projects')):
+        logger.info('Configuration problem')
         return False
+
+    for required_key in ['trello_api_key',
+                         'trello_api_secret',
+                         'trello_token',
+                         'trello_token_secret',
+                         'sync_projects']:
+        if not conf.has_option('DEFAULT', required_key):
+            logger.error('Missing required config: %s' % required_key, e)
+            return False
+
     for sync_project in conf.get('DEFAULT', 'sync_projects').split():
         if conf.has_section(sync_project):
-            if conf.has_option(sync_project, 'tw_project_name') and conf.has_option(sync_project, 'trello_board_name'):
+            if (conf.has_option(sync_project, 'tw_project_name') and
+                conf.has_option(sync_project, 'trello_board_name')):
                 project = {}
-                project['tw_project_name'] = conf.get(sync_project, 'tw_project_name')
-                project['trello_board_name'] = conf.get(sync_project, 'trello_board_name')
-                if conf.has_option(sync_project, 'trello_todo_list'):
-                    project['trello_todo_list'] = conf.get(sync_project, 'trello_todo_list')
-                else:
-                    project['trello_todo_list'] = 'To Do'
-                if conf.has_option(sync_project, 'trello_doing_list'):
-                    project['trello_doing_list'] = conf.get(sync_project, 'trello_doing_list')
+                for key in ['trello_board_name', 'trello_doing_list',
+                            'trello_done_list', 'trello_todo_list',
+                            'tw_project_name']:
+                    if conf.has_option(sync_project, key):
+                        project[key] = conf.get(sync_project, key)
+
+                if not conf.has_option(sync_project, 'trello_done_list'):
+                     project['trello_done_list'] = 'Done'
                 else:
                     project['trello_doing_list'] = 'Doing'
                 if conf.has_option(sync_project, 'trello_done_list'):
@@ -53,9 +72,12 @@ def parse_config(config_file):
                     project['trello_done_list'] = 'Done'
                 sync_projects.append(project)
             else:
+                logger.info('Skipping %s, missing tw_project_name or trello_board_name' % sync_project)
                 return False
         else:
+            logger.info('Missing config for %s' % sync_project)
             return False
+
     trello_api_key = conf.get('DEFAULT', 'trello_api_key')
     trello_api_secret = conf.get('DEFAULT', 'trello_api_secret')
     trello_token = conf.get('DEFAULT', 'trello_token')
@@ -73,19 +95,26 @@ def parse_config(config_file):
 
 def get_trello_boards():
     """ Get all Trello boards """
-    trello_client = TrelloClient(api_key=trello_api_key, api_secret=trello_api_secret, token=trello_token, token_secret=trello_token_secret)
+    logger.info('Fetching Trello boards ...')
+    trello_client = TrelloClient(
+        api_key=trello_api_key,
+        api_secret=trello_api_secret,
+        token=trello_token,
+        token_secret=trello_token_secret)
+    logger.info('... done')
     return trello_client.list_boards()
 
 def get_trello_board(board_name):
     """
     Returns Trello board from name
-    If does not exist create it and returns new board
+    If it does not exist, create it and return new board
 
     :board_name: the board name
     """
     trello_boards = get_trello_boards()
     for trello_board in trello_boards:
         if trello_board.name == board_name and not trello_board.closed:
+            logger.info('Fetched board %s' % board_name)
             return trello_board
     return create_trello_board(board_name)
 
@@ -95,7 +124,12 @@ def create_trello_board(board_name):
 
     :board_name: the board name
     """
-    trello_client = TrelloClient(api_key=trello_api_key, api_secret=trello_api_secret, token=trello_token, token_secret=trello_token_secret)
+    trello_client = TrelloClient(
+        api_key=trello_api_key,
+        api_secret=trello_api_secret,
+        token=trello_token,
+        token_secret=trello_token_secret)
+    logger.info('Created board %s' % board_name)
     return trello_client.add_board(board_name)
 
 def get_trello_lists(board_name):
@@ -104,6 +138,7 @@ def get_trello_lists(board_name):
 
     :board_name: the board name
     """
+    logger.info('Fetching Trello lists ...')
     return get_trello_board(board_name).open_lists()
 
 def get_trello_list(board_name, trello_lists, list_name):
@@ -116,6 +151,7 @@ def get_trello_list(board_name, trello_lists, list_name):
     """
     for trello_list in trello_lists:
         if trello_list.name == list_name:
+            logger.info('Fetched list %s' % list_name)
             return trello_list
     trello_list = create_trello_list(board_name, list_name)
     trello_lists.append(trello_list) # mutate the list, eek!
@@ -128,6 +164,7 @@ def create_trello_list(board_name, list_name):
     :board_name: the board name
     :list_name: the list name
     """
+    logger.info('Creating list %s' % list_name)
     trello_board = get_trello_board(board_name)
     return trello_board.add_list(list_name)
 
@@ -148,12 +185,18 @@ def delete_trello_card(trello_card_id):
 
     :trello_card_id: Trello card ID
     """
-    trello_client = TrelloClient(api_key=trello_api_key, api_secret=trello_api_secret, token=trello_token, token_secret=trello_token_secret)
+    trello_client = TrelloClient(
+        api_key=trello_api_key,
+        api_secret=trello_api_secret,
+        token=trello_token,
+        token_secret=trello_token_secret)
     try:
         trello_card = trello_client.get_card(trello_card_id)
         trello_card.delete()
-    except Exception:
-        print('Cannot find Trello card with ID {0} deleted in Task Warrior. Maybe you deleted it in Trello too.'.format(trello_card_id))
+        logger.info('Deleted card %s' % trello_card_id)
+    except Exception as e:
+        logger.exception('Cannot find Trello card')
+        print('Cannot find Trello card with ID {0} deleted in Taskwarrior. Maybe you deleted it in Trello too.'.format(trello_card_id))
 
 def upload_tw_task(tw_task, trello_list):
     """
@@ -168,15 +211,15 @@ def upload_tw_task(tw_task, trello_list):
     # Save the Trello Card ID into Task
     tw_task['trelloid'] = new_trello_card.id
     tw_task.save()
+    logger.info('Created Trello card %s' % tw_task['description'])
 
 def download_trello_card(project_name, list_name, trello_card, task_warrior, doing_list_name, done_list_name):
-    """
-    Download all contens of trello card creating new Task Warrior task
+    """Download all contents of Trello card, creating new Taskwarrior task
 
     :project_name: the name of project where the card is stored
     :list_name: the name of list where the card is stored
     :trello_card: a Trello Card object
-    :task_warrior: Task Warrior object
+    :task_warrior: Taskwarrior object
     :doing_list_name: name of doing list to set task active
     :done_list_name: name of done list to set task done
     """
@@ -201,12 +244,16 @@ def get_tw_task_by_trello_id(trello_id):
     :project_name: the project name
     :trello_id: Trello card ID
     """
-    tw_tasks = TaskWarrior(taskrc_location=taskwarrior_taskrc_location, data_location=taskwarrior_data_location).tasks.filter(trelloid=trello_id)
+    tw_tasks = TaskWarrior(
+        taskrc_location=taskwarrior_taskrc_location,
+        data_location=taskwarrior_data_location
+    ).tasks.filter(trelloid=trello_id)
     if len(tw_tasks) == 0:
         return None
     elif len(tw_tasks) == 1:
         return tw_tasks[0]
     else:
+        logger.error('Duplicated Trello ID {0} in Taskwarrior tasks. Trello IDs must be unique, please fix it before sync.'.format(trello_id))
         raise ValueError('Duplicated Trello ID {0} in Taskwarrior tasks. Trello IDs must be unique, please fix it before sync.'.format(trello_id))
 
 def upload_new_tw_tasks(trello_lists, project_name, board_name, todo_list_name, doing_list_name, done_list_name):
@@ -239,6 +286,7 @@ def upload_new_tw_tasks(trello_lists, project_name, board_name, todo_list_name, 
         upload_tw_task(tw_completed_task, get_trello_list(board_name, trello_lists, done_list_name))
         tw_completed_task['trellolistname'] = done_list_name
         tw_completed_task.save()
+    logger.info('Uploaded new cards: %s pending, %s completed' % (len(tw_pending_tasks), len(tw_completed_tasks)))
 
 def sync_trello_tw(trello_lists, project_name, board_name, todo_list_name, doing_list_name, done_list_name):
     """
@@ -252,32 +300,32 @@ def sync_trello_tw(trello_lists, project_name, board_name, todo_list_name, doing
     :done_list_name: name of list for done tasks
     """
     task_warrior = TaskWarrior(taskrc_location=taskwarrior_taskrc_location, data_location=taskwarrior_data_location)
-    # Get all Task Warrior deleted tasks and seek for ones that have trelloid (locally deleted)
+    # Get all Taskwarrior deleted tasks and seek for ones that have trelloid (locally deleted)
     tw_deleted_tasks = task_warrior.tasks.filter(project=project_name,status='deleted')
     for tw_deleted_task in tw_deleted_tasks:
         if tw_deleted_task['trelloid']:
             delete_trello_card(tw_deleted_task['trelloid'])
             tw_deleted_task['trelloid'] = None
             tw_deleted_task.save()
-    # Compare and sync Trello with Task Warrior
+    # Compare and sync Trello with Taskwarrior
     trello_dic_cards = get_trello_dic_cards(trello_lists)
     trello_cards_ids = []
     for list_name in trello_dic_cards:
         for trello_card in trello_dic_cards[list_name]:
-            # Fech all data from card
+            # Fetch all data from card
             trello_card.fetch(False)
             trello_cards_ids.append(trello_card.id)
             tw_task = get_tw_task_by_trello_id(trello_card.id)
             if tw_task:
                 sync_task_card(tw_task, trello_card, board_name, trello_lists, list_name, todo_list_name, doing_list_name, done_list_name)
             else:
-                # Download new Trello cards that not present in Task Warrior
+                # Download new Trello cards that not present in Taskwarrior
                 download_trello_card(project_name, list_name, trello_card, task_warrior, doing_list_name, done_list_name)
-    # Compare Trello and TaskWarrior tasks for remove deleted Trello tasks in Task Warrior
+    # Compare Trello and TaskWarrior tasks for remove deleted Trello tasks in Taskwarrior
     tw_pending_tasks_ids   = set((task['trelloid'] for task in task_warrior.tasks.pending().filter(project=project_name)))
     tw_completed_tasks_ids = set((task['trelloid'] for task in task_warrior.tasks.completed().filter(project=project_name)))
     tw_tasks_ids = tw_pending_tasks_ids | tw_completed_tasks_ids
-    tw_tasks_ids.discard(None) # Remove None element if present (new tasks created with Task Warrior)
+    tw_tasks_ids.discard(None) # Remove None element if present (new tasks created with Taskwarrior)
     trello_cards_ids = set(trello_cards_ids)
     deleted_trello_tasks_ids = tw_tasks_ids - trello_cards_ids
     for deleted_trello_task_id in deleted_trello_tasks_ids:
@@ -285,12 +333,13 @@ def sync_trello_tw(trello_lists, project_name, board_name, todo_list_name, doing
         task_to_delete['trelloid'] = None
         task_to_delete.save()
         task_to_delete.delete()
+    logger.info('Synced. Deleted (%s local, %s remote), updated or new: %s' % (len(tw_deleted_tasks), len(deleted_trello_tasks_ids), len(trello_dic_cards)))
 
 def sync_task_card(tw_task, trello_card, board_name, trello_lists, list_name, todo_list_name, doing_list_name, done_list_name):
     """
-    Sync existing Trello Card with existing Task Warrior task
+    Sync existing Trello Card with existing Taskwarrior task
 
-    :tw_task: the Task Warrior task object
+    :tw_task: the Taskwarrior task object
     :trello_card: the Trello card object
     :board_name: the name of Trello board
     :trello_lists: the set of lists
@@ -393,14 +442,14 @@ def main():
     for project in sync_projects:
         # Get all Trello lists
         trello_lists = get_trello_lists(project['trello_board_name'])
-        # Do sync Trello - Task Warrior
+        # Do sync Trello - Taskwarrior
         sync_trello_tw(trello_lists,
                        project['tw_project_name'],
                        project['trello_board_name'],
                        project['trello_todo_list'],
                        project['trello_doing_list'],
                        project['trello_done_list'])
-        # Upload new Task Warrior tasks
+        # Upload new Taskwarrior tasks
         upload_new_tw_tasks(trello_lists,
                             project['tw_project_name'],
                             project['trello_board_name'],
