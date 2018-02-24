@@ -309,6 +309,7 @@ def sync_trello_tw(trello_lists, project_name, board_name, todo_list_name, doing
             tw_deleted_task.save()
     # Compare and sync Trello with Taskwarrior
     trello_dic_cards = get_trello_dic_cards(trello_lists)
+    logger.info('\n'.join(['%s: %s' % (ln, len(cards)) for ln, cards in trello_dic_cards.items()]))
     trello_cards_ids = []
     for list_name in trello_dic_cards:
         for trello_card in trello_dic_cards[list_name]:
@@ -317,9 +318,11 @@ def sync_trello_tw(trello_lists, project_name, board_name, todo_list_name, doing
             trello_cards_ids.append(trello_card.id)
             tw_task = get_tw_task_by_trello_id(trello_card.id)
             if tw_task:
+                logger.info('Syncing: %s' % tw_task)
                 sync_task_card(tw_task, trello_card, board_name, trello_lists, list_name, todo_list_name, doing_list_name, done_list_name)
             else:
                 # Download new Trello cards that not present in Taskwarrior
+                logger.info('Downloading: %s' % trello_card)
                 download_trello_card(project_name, list_name, trello_card, task_warrior, doing_list_name, done_list_name)
     # Compare Trello and TaskWarrior tasks for remove deleted Trello tasks in Taskwarrior
     tw_pending_tasks_ids   = set((task['trelloid'] for task in task_warrior.tasks.pending().filter(project=project_name)))
