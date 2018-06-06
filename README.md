@@ -1,12 +1,9 @@
 # TrelloWarrior
 
-[https://img.shields.io/pypi/v/trellowarrior.svg](https://pypi.python.org/pypi/trellowarrior)
-
-[https://img.shields.io/travis/ogarcia/trellowarrior.svg](https://travis-ci.org/ogarcia/trellowarrior)
-
-[https://readthedocs.org/projects/trellowarrior/badge/?version=latest](https://trellowarrior.readthedocs.io/en/latest/?badge=latest)
-
-[https://pyup.io/repos/github/ogarcia/trellowarrior/shield.svg](https://pyup.io/repos/github/ogarcia/trellowarrior/)
+[![img](https://img.shields.io/pypi/v/trellowarrior.svg)](https://pypi.python.org/pypi/trellowarrior)
+[![img](https://img.shields.io/travis/ogarcia/trellowarrior.svg)](https://travis-ci.org/ogarcia/trellowarrior)
+[![img](https://readthedocs.org/projects/trellowarrior/badge/?version=latest)](https://trellowarrior.readthedocs.io/en/latest/?badge=latest)
+[![img](https://pyup.io/repos/github/ogarcia/trellowarrior/shield.svg)](https://pyup.io/repos/github/ogarcia/trellowarrior/)
 
 
 Tool to sync Taskwarrior projects with Trello boards.
